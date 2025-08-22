@@ -1,0 +1,225 @@
+[
+	{
+		"seq": 0,
+		"seg": "Header",
+		"field_name": "RecordType",
+		"action": "none"
+	},
+	{
+		"seq": 1,
+		"seg": "Header",
+		"field_name": "FileDate",
+		"action": "none"
+	},
+	{
+		"seq": 2,
+		"seg": "Header",
+		"field_name": "FileID",
+		"action": "none"
+	},
+	{
+		"seq": 3,
+		"seg": "Header",
+		"field_name": "FileName",
+		"pattern": ["*.txt", "*.hl7"],
+		"action": "none"
+	},
+	{
+		"seq": 0,
+		"seg": "*",
+		"field_name": "ID",
+		"action": "hash"
+	},
+	{
+		"seq": 1,
+		"seg": "*",
+		"field_name": "MemberID",
+		"action": "hash"
+	},
+	{
+		"seq": 2,
+		"seg": "*",
+		"field_name": "LastName",
+		"action": "pseudonymization"
+	},
+	{
+		"seq": 3,
+		"seg": "*",
+		"field_name": "FirstName",
+		"action": "pseudonymization"
+	},
+	{
+		"seq": 4,
+		"seg": "*",
+		"field_name": "MiddleName",
+		"action": "pseudonymization"
+	},
+	{
+		"seq": 5,
+		"seg": "*",
+		"field_name": "Suffix",
+		"action": "pseudonymization"
+	},
+	{
+		"seq": 6,
+		"seg": "*",
+		"field_name": "Gender",
+		"action": "change"
+	},
+	{
+		"seq": 7,
+		"seg": "*",
+		"field_name": "DateOfBirth",
+		"action": "mask"
+	},
+	{
+		"seq": 8,
+		"seg": "*",
+		"field_name": "MaritalStatus",
+		"action": "none"
+	},
+	{
+		"seq": 9,
+		"seg": "*",
+		"field_name": "PreferredLanguage",
+		"action": "none"
+	},
+	{
+		"seq": 10,
+		"seg": "*",
+		"field_name": "SpokenLanguage",
+		"action": "none"
+	},
+	{
+		"seq": 11,
+		"seg": "*",
+		"field_name": "Email",
+		"action": "mask"
+	},
+	{
+		"seq": 12,
+		"seg": "*",
+		"field_name": "ResidentialAddress",
+		"action": "pseudonymization"
+	},
+	{
+		"seq": 13,
+		"seg": "*",
+		"field_name": "MailingAddress",
+		"action": "pseudonymization"
+	},
+	{
+		"seq": 14,
+		"seg": "*",
+		"field_name": "HomePhone",
+		"action": "mask"
+	},
+	{
+		"seq": 15,
+		"seg": "*",
+		"field_name": "CellPhone",
+		"action": "mask"
+	},
+	{
+		"seq": 16,
+		"seg": "*",
+		"field_name": "CoverageType",
+		"action": "none"
+	},
+	{
+		"seq": 17,
+		"seg": "*",
+		"field_name": "CoverageRole",
+		"action": "none"
+	},
+	{
+		"seq": 18,
+		"seg": "*",
+		"field_name": "EffectiveDate",
+		"action": "none"
+	},
+	{
+		"seq": 1,
+		"seg": "MemberEnrollment",
+		"field_name": "EnrollmentID",
+		"action": "hash"
+	},
+	{
+		"seq": 2,
+		"seg": "MemberEnrollment",
+		"field_name": "StartDate",
+		"action": "mask"
+	},
+	{
+		"seq": 3,
+		"seg": "MemberEnrollment",
+		"field_name": "EndDate",
+		"action": "mask"
+	},
+	{
+		"seq": 1,
+		"seg": "EnrollmentStatus",
+		"field_name": "EnrollmentID",
+		"action": "hash"
+	},
+	{
+		"seq": 2,
+		"seg": "EnrollmentStatus",
+		"field_name": "Status",
+		"action": "none"
+	},
+	{
+		"seq": 3,
+		"seg": "EnrollmentStatus",
+		"field_name": "StartDate",
+		"action": "mask"
+	},
+	{
+		"seq": 4,
+		"seg": "EnrollmentStatus",
+		"field_name": "EndDate",
+		"action": "mask"
+	},
+	{
+		"seq": 1,
+		"seg": "RateCellital",
+		"field_name": "EnrollmentID",
+		"action": "hash"
+	},
+	{
+		"seq": 1,
+		"seg": "MemberOther",
+		"field_name": "AltID1",
+		"action": "hash"
+	},
+	{
+		"seq": 2,
+		"seg": "MemberOther",
+		"field_name": "AltID2",
+		"action": "hash"
+	},
+	{
+		"seq": 1,
+		"seg": "MemberPCP",
+		"field_name": "ID",
+		"action": "hash"
+	},
+	{
+		"seq": 1,
+		"seg": "RateCellVital",
+		"field_name": "ID",
+		"action": "hash"
+	},
+	{
+		"seq": 1,
+		"seg": "MemberPCP",
+		"field_name": "ID",
+		"action": "hash"
+	},
+	{
+		"seq": 0,
+		"seg": "Trailer",
+		"field_name": "FileDate",
+		"action": "none"
+	}
+]
