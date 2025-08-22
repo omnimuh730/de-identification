@@ -71,36 +71,22 @@ def apply_member_deidentification(line, deid_rules):
     if not segment_type:
         return line
     
-    print(f"Processing {segment_type} segment with {len(fields)} fields")
-    
+    # print(f"Processing {segment_type} segment with {len(fields)} fields")  # No longer needed
     deidentified_fields = fields.copy()
-    
     # Apply de-identification based on field sequence and segment type
     for field_seq, field_value in enumerate(fields):
-        if not field_value:  # Skip empty fields
+        if not field_value:
             continue
-            
         field_name, action = get_field_action_by_seg_and_seq(segment_type, field_seq, deid_rules)
-        
         if action != 'none':
             original_value = field_value
-            
-            # Special handling for different field types
             if 'Name' in field_name and action == 'pseudonymization':
-                # Handle name fields with space-separated multiple names
                 deidentified_value = apply_member_name_pseudonymization(field_value)
             elif 'Address' in field_name and action == 'pseudonymization':
-                # Handle address fields
                 deidentified_value = apply_member_address_pseudonymization(field_value)
             else:
-                # Apply standard de-identification
                 deidentified_value = apply_deidentification_action(original_value, action)
-            
             deidentified_fields[field_seq] = deidentified_value
-            
-            if field_seq < 5:  # Show progress for first few fields only
-                print(f"Applied {action} to field {field_seq} ({field_name}): {original_value} -> {deidentified_value}")
-    
     return '|'.join(deidentified_fields)
 
 def apply_member_name_pseudonymization(name_field):
@@ -136,32 +122,48 @@ def apply_member_address_pseudonymization(address_field):
 
 def process_member_file(input_file_path, output_file_path, deid_rules):
     """Process a single Member text file"""
-    print(f"Processing Member file: {input_file_path}")
-    
+    import threading
+    import sys
+    import time
+    print(f"De-identification of {os.path.basename(input_file_path)} started")
     try:
-        with open(input_file_path, 'r', encoding='utf-8') as infile:
-            lines = infile.readlines()
-        
-        deidentified_lines = []
-        for i, line in enumerate(lines):
-            deidentified_line = apply_member_deidentification(line.rstrip('\n\r'), deid_rules)
-            deidentified_lines.append(deidentified_line)
-            
-            if i < 10:  # Show progress for first 10 lines
-                print(f"Processed line {i + 1}")
-        
         # Create output directory if it doesn't exist
         os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
-        
-        # Write de-identified data
-        with open(output_file_path, 'w', encoding='utf-8') as outfile:
-            for line in deidentified_lines:
-                outfile.write(line + '\n')
-        
+
+        # Open input and output files
+        with open(input_file_path, 'r', encoding='utf-8') as infile, \
+             open(output_file_path, 'w', encoding='utf-8') as outfile:
+            # Count total lines for progress
+            total_lines = 0
+            for _ in infile:
+                total_lines += 1
+            infile.seek(0)
+
+            progress = {'current': 0}
+            import threading, time
+            def progress_printer():
+                last_percent = -1
+                while progress['current'] < total_lines:
+                    percent = int((progress['current'] / total_lines) * 100)
+                    if percent != last_percent:
+                        print(f"\r{percent}%", end='', flush=True)
+                        last_percent = percent
+                    time.sleep(0.05)
+                print(f"\r100%", flush=True)
+
+            t = threading.Thread(target=progress_printer)
+            t.start()
+
+            for i, line in enumerate(infile):
+                deidentified_line = apply_member_deidentification(line.rstrip('\n\r'), deid_rules)
+                outfile.write(deidentified_line + '\n')
+                progress['current'] = i + 1
+
+            t.join()
+
         print(f"De-identified Member file saved to: {output_file_path}")
-        print(f"Processed {len(deidentified_lines)} lines")
+        print(f"Processed {total_lines} lines")
         return True
-        
     except Exception as e:
         print(f"Error processing Member file {input_file_path}: {str(e)}")
         return False
@@ -172,20 +174,18 @@ def run(input_dir, output_dir):
     print(f"Input directory: {input_dir}")
     print(f"Output directory: {output_dir}")
     
-    # Load de-identification rules
-    deid_rules_path = os.path.join(input_dir, "deid_rules.json")
+    # Load de-identification rules from Config/Member/rules.json
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    deid_rules_path = os.path.join(script_dir, "Config", "Member", "rules.json")
     if not os.path.exists(deid_rules_path):
         print(f"De-identification rules file not found: {deid_rules_path}")
         return False
-    
     try:
         deid_rules = load_deid_rules(deid_rules_path)
         print(f"Loaded {len(deid_rules)} de-identification rules")
-        
         # Debug: Show segment types found in rules
         segments = set(rule.get('seg') for rule in deid_rules)
         print(f"Segment types in rules: {segments}")
-        
     except Exception as e:
         print(f"Error loading de-identification rules: {str(e)}")
         return False
@@ -195,24 +195,30 @@ def run(input_dir, output_dir):
     
     # Note: We don't copy the rules file for Member data as it only processes .txt and .hl7 files
     
-    # Process all text and HL7 files in input directory
+    # Find all text and HL7 files in input directory
+    file_list = [f for f in os.listdir(input_dir) if f.endswith(('.txt', '.hl7')) and f != 'deid_rules.json']
+    total_count = len(file_list)
+    print(f"{total_count} files found for de-identification:")
+    for fname in file_list:
+        print(f"  - {fname}")
+    if total_count == 0:
+        print("No files to process.")
+        return False
+    print("\nDe-identification starting...")
+
     success_count = 0
-    total_count = 0
-    
-    for filename in os.listdir(input_dir):
-        if filename.endswith(('.txt', '.hl7')) and filename != 'deid_rules.json':
-            input_file_path = os.path.join(input_dir, filename)
-            output_file_path = os.path.join(output_dir, filename)
-            
-            total_count += 1
-            if process_member_file(input_file_path, output_file_path, deid_rules):
-                success_count += 1
-            else:
-                print(f"Failed to process: {filename}")
-    
+    for idx, filename in enumerate(file_list):
+        input_file_path = os.path.join(input_dir, filename)
+        output_file_path = os.path.join(output_dir, filename)
+        if process_member_file(input_file_path, output_file_path, deid_rules):
+            success_count += 1
+        else:
+            print(f"Failed to process: {filename}")
+        percent = ((idx + 1) / total_count) * 100
+        print(f"=== {percent:.1f}% === ({idx + 1}/{total_count} files processed)")
+
     print(f"\nMember de-identification completed!")
     print(f"Successfully processed: {success_count}/{total_count} files")
-    
     return success_count == total_count
 
 if __name__ == "__main__":
