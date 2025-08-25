@@ -200,19 +200,7 @@
 	},
 	{
 		"seq": 1,
-		"seg": "MemberPCP",
-		"field_name": "ID",
-		"action": "hash"
-	},
-	{
-		"seq": 1,
 		"seg": "RateCellVital",
-		"field_name": "ID",
-		"action": "hash"
-	},
-	{
-		"seq": 1,
-		"seg": "MemberPCP",
 		"field_name": "ID",
 		"action": "hash"
 	},
@@ -221,5 +209,35 @@
 		"seg": "Trailer",
 		"field_name": "FileDate",
 		"action": "none"
+	},
+	{
+		"seq": 1,
+		"seg": "MemberCondition",
+		"field_name": "ID",
+		"action": "hash"
+	},
+	{
+		"seq": 1,
+		"seg": "PersonalRepresentative",
+		"field_name": "ID",
+		"action": "hash"
+	},
+	{
+		"seq": 1,
+		"seg": "EmergencyContact",
+		"field_name": "ID",
+		"action": "hash"
+	},
+	{
+		"seq": 1,
+		"seg": "COBInformation",
+		"field_name": "ID",
+		"action": "hash"
+	},
+	{
+		"seq": 1,
+		"seg": "MemberMBIHic",
+		"field_name": "ID",
+		"action": "hash"
 	}
 ]
