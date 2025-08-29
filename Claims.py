@@ -45,7 +45,6 @@ def apply_claims_deidentification(line, deid_rules):
     if not segment_type:
         return line
     
-    # print(f"Processing {segment_type} segment with {len(fields)} fields")  # No longer needed
     deidentified_fields = fields.copy()
     # Apply de-identification based on field sequence and segment type
     for field_seq, field_value in enumerate(fields):
@@ -70,13 +69,12 @@ def apply_claims_name_pseudonymization(name_field):
     
     from utils import generate_fake_name
     
-    # Split by spaces to handle multiple names in one field
     name_parts = name_field.split()
     fake_names = []
     
     for _ in name_parts:
         fake_name = generate_fake_name()
-        fake_names.append(fake_name['given'])  # Use given names for all parts
+        fake_names.append(fake_name['given'])
     
     return ' '.join(fake_names)
 
@@ -87,9 +85,7 @@ def apply_claims_address_pseudonymization(address_field):
     
     from utils import generate_fake_address
     
-    # Generate fake address and extract the street part
     fake_address = generate_fake_address()
-    # Extract just the street part (before the first ^)
     street_part = fake_address.split('^')[0] if '^' in fake_address else fake_address
     
     return street_part
@@ -101,36 +97,32 @@ def process_claims_file(input_file_path, output_file_path, deid_rules):
     import time
     print(f"De-identification of {os.path.basename(input_file_path)} started")
     try:
-        # Create output directory if it doesn't exist
         os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
 
-        # Open input and output files
         with open(input_file_path, 'r', encoding='utf-8') as infile, \
              open(output_file_path, 'w', encoding='utf-8') as outfile:
-            # Count total lines for progress
             total_lines = 0
             for _ in infile:
                 total_lines += 1
             infile.seek(0)
 
             progress = {'current': 0}
-            import threading, time
             def progress_printer():
                 last_percent = -1
                 while progress['current'] < total_lines:
                     percent = int((progress['current'] / total_lines) * 100)
                     if percent != last_percent:
-                        print(f"\\r{percent}%", end='', flush=True)
+                        print(f"\r{percent}%", end='', flush=True)
                         last_percent = percent
                     time.sleep(0.05)
-                print(f"\\r100%", flush=True)
+                print(f"\r100%", flush=True)
 
             t = threading.Thread(target=progress_printer)
             t.start()
 
             for i, line in enumerate(infile):
-                deidentified_line = apply_claims_deidentification(line.rstrip('\\n\\r'), deid_rules)
-                outfile.write(deidentified_line + '\\n')
+                deidentified_line = apply_claims_deidentification(line.rstrip('\n\r'), deid_rules)
+                outfile.write(deidentified_line + '\n')
                 progress['current'] = i + 1
 
             t.join()
@@ -148,7 +140,6 @@ def run(input_dir, output_dir):
     print(f"Input directory: {input_dir}")
     print(f"Output directory: {output_dir}")
     
-    # Load de-identification rules from Config/Claims/rules.json
     script_dir = os.path.dirname(os.path.abspath(__file__))
     deid_rules_path = os.path.join(script_dir, "Config", "Claims", "rules.json")
     if not os.path.exists(deid_rules_path):
@@ -157,19 +148,14 @@ def run(input_dir, output_dir):
     try:
         deid_rules = load_deid_rules(deid_rules_path)
         print(f"Loaded {len(deid_rules)} de-identification rules")
-        # Debug: Show segment types found in rules
         segments = set(rule.get('seg') for rule in deid_rules)
         print(f"Segment types in rules: {segments}")
     except Exception as e:
         print(f"Error loading de-identification rules: {str(e)}")
         return False
     
-    # Create output directory
     os.makedirs(output_dir, exist_ok=True)
     
-    # Note: We don't copy the rules file for Claims data as it only processes .txt and .hl7 files
-    
-    # Find all text and HL7 files in input directory
     file_list = [f for f in os.listdir(input_dir) if f.endswith(('.txt', '.hl7')) and f != 'deid_rules.json']
     total_count = len(file_list)
     print(f"{total_count} files found for de-identification:")
@@ -178,7 +164,7 @@ def run(input_dir, output_dir):
     if total_count == 0:
         print("No files to process.")
         return False
-    print("\\nDe-identification starting...")
+    print("\nDe-identification starting...")
 
     success_count = 0
     for idx, filename in enumerate(file_list):
@@ -191,12 +177,11 @@ def run(input_dir, output_dir):
         percent = ((idx + 1) / total_count) * 100
         print(f"=== {percent:.1f}% === ({idx + 1}/{total_count} files processed)")
 
-    print(f"\\nClaims de-identification completed!")
+    print(f"\nClaims de-identification completed!")
     print(f"Successfully processed: {success_count}/{total_count} files")
     return success_count == total_count
 
 if __name__ == "__main__":
-    # Test with default paths
     import sys
     script_dir = os.path.dirname(os.path.abspath(__file__))
     input_dir = os.path.join(script_dir, "Data", "Claims")
