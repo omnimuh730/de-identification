@@ -57,8 +57,30 @@ def run_Member():
     
     return success
 
+def run_Claims():
+	"""Main entry point for Claims de-identification processes"""
+	print("=== De-identification Process (Claims) ===\n")
+	print("Processing Claims files...\n")
+
+	current_dir = os.path.dirname(os.path.abspath(__file__))
+	claims_dir = os.path.join(current_dir, "Data", "Claims")
+	claims_deid_dir = os.path.join(current_dir, "De-Identified", "Claims")
+
+	if not os.path.exists(claims_dir):
+		print(f"Claims directory does not exist: {claims_dir}")
+		return False
+	print("Processing Claims files...")
+	success = run_hl7_deidentification(claims_dir, claims_deid_dir, "Claims")
+
+	if success:
+		print("\n✓ Claims de-identification completed successfully!")
+	else:
+		print("\n✗ Claims de-identification process failed!")
+	return success
+
 def main():	
 	run_Member()
+	run_Claims()
 
 	# Future expansion point for other file types:
 	# - CCD files

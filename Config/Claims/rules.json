@@ -1,0 +1,50 @@
+[
+	{
+		"seq": 0,
+		"seg": "CLAIMS",
+		"field_name": "CLAIM_ID",
+		"action": "hash"
+	},
+	{
+		"seq": 11,
+		"seg": "CLAIMS",
+		"field_name": "MEM_NBR",
+		"action": "hash"
+	},
+	{
+		"seq": 46,
+		"seg": "CLAIMS",
+		"field_name": "SVC_PROV_NAME",
+		"action": "pseudonymization"
+	},
+	{
+		"seq": 55,
+		"seg": "CLAIMS",
+		"field_name": "MEM_DOB",
+		"action": "mask"
+	},
+	{
+		"seq": 56,
+		"seg": "CLAIMS",
+		"field_name": "MEM_GENDER",
+		"action": "change"
+	},
+	{
+		"seq": 57,
+		"seg": "CLAIMS",
+		"field_name": "MEM_STATE",
+		"action": "change"
+	},
+	{
+		"seq": 58,
+		"seg": "CLAIMS",
+		"field_name": "MEM_MARKET",
+		"action": "change"
+	},
+	{
+		"seq": 59,
+		"seg": "CLAIMS",
+		"field_name": "MEM_ZIP",
+		"action": "hash"
+	}
+]
