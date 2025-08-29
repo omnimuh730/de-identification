@@ -15,38 +15,12 @@ def identify_segment_type(line, deid_rules):
     
     fields = line.strip().split('|')
     
-    # Check if it's a Header segment (has pattern field ending with .txt or .hl7)
-    header_rules = [rule for rule in deid_rules if rule.get('seg') == 'Header']
-    for rule in header_rules:
-        if 'pattern' in rule:
-            field_seq = rule.get('seq', 0)
-            if field_seq < len(fields):
-                field_value = fields[field_seq]
-                patterns = rule.get('pattern', [])
-                for pattern in patterns:
-                    if pattern == '*.txt' and field_value.endswith('.txt'):
-                        return 'Header', fields
-                    elif pattern == '*.hl7' and field_value.endswith('.hl7'):
-                        return 'Header', fields
+    # Simple check for header: if the first field is 'CLAIM_ID', it's a header
+    if fields and fields[0] == 'CLAIM_ID':
+        return 'Header', fields
     
-    # Check if it's a named segment (first field matches a known segment name)
-    known_segments = set()
-    for rule in deid_rules:
-        seg = rule.get('seg')
-        if seg and seg not in ['Header', '*']:
-            known_segments.add(seg)
-    
-    if fields and fields[0] in known_segments:
-        return fields[0], fields
-    
-    # Check if it's a Trailer segment (look for specific patterns)
-    if len(fields) >= 2 and any('trailer' in rule.get('seg', '').lower() for rule in deid_rules):
-        # Simple heuristic: if it looks like a trailer (short line with dates)
-        if len(fields) <= 3 and all(field.isdigit() or not field for field in fields):
-            return 'Trailer', fields
-    
-    # Default to '*' segment (generic claims data)
-    return '*', fields
+    # Otherwise, assume it's a CLAIMS data row
+    return 'CLAIMS', fields
 
 def get_field_action_by_seg_and_seq(segment_type, field_seq, deid_rules):
     """Get the de-identification action for a field based on segment type and sequence"""
@@ -146,17 +120,17 @@ def process_claims_file(input_file_path, output_file_path, deid_rules):
                 while progress['current'] < total_lines:
                     percent = int((progress['current'] / total_lines) * 100)
                     if percent != last_percent:
-                        print(f"\r{percent}%", end='', flush=True)
+                        print(f"\\r{percent}%", end='', flush=True)
                         last_percent = percent
                     time.sleep(0.05)
-                print(f"\r100%", flush=True)
+                print(f"\\r100%", flush=True)
 
             t = threading.Thread(target=progress_printer)
             t.start()
 
             for i, line in enumerate(infile):
-                deidentified_line = apply_claims_deidentification(line.rstrip('\n\r'), deid_rules)
-                outfile.write(deidentified_line + '\n')
+                deidentified_line = apply_claims_deidentification(line.rstrip('\\n\\r'), deid_rules)
+                outfile.write(deidentified_line + '\\n')
                 progress['current'] = i + 1
 
             t.join()
@@ -204,7 +178,7 @@ def run(input_dir, output_dir):
     if total_count == 0:
         print("No files to process.")
         return False
-    print("\nDe-identification starting...")
+    print("\\nDe-identification starting...")
 
     success_count = 0
     for idx, filename in enumerate(file_list):
@@ -217,7 +191,7 @@ def run(input_dir, output_dir):
         percent = ((idx + 1) / total_count) * 100
         print(f"=== {percent:.1f}% === ({idx + 1}/{total_count} files processed)")
 
-    print(f"\nClaims de-identification completed!")
+    print(f"\\nClaims de-identification completed!")
     print(f"Successfully processed: {success_count}/{total_count} files")
     return success_count == total_count
 
