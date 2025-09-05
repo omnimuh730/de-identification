@@ -78,13 +78,32 @@ def run_Claims():
 		print("\n✗ Claims de-identification process failed!")
 	return success
 
-def main():	
-	run_Member()
-	run_Claims()
+def run_GuidingCare():
+    """Main entry point for Guiding Care de-identification processes"""
+    print("=== De-identification Process (Guiding Care) ===\n")
+    print("Processing Guiding Care files...\n")
 
-	# Future expansion point for other file types:
-	# - CCD files
-	# - Other healthcare data formats
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    gc_dir = os.path.join(current_dir, "Data", "Guiding Care")
+    gc_deid_dir = os.path.join(current_dir, "De-Identified", "Guiding Care")
 
+    if not os.path.exists(gc_dir):
+        print(f"Guiding Care directory does not exist: {gc_dir}")
+        return False
+    print("Processing Guiding Care files...")
+    from GuidingCare import run as run_guidingcare
+    success = run_guidingcare(gc_dir, gc_deid_dir)
+
+    if success:
+        print("\n✓ Guiding Care de-identification completed successfully!")
+    else:
+        print("\n✗ Guiding Care de-identification process failed!")
+    return success
+
+def main():
+    run_Member()
+    run_Claims()
+    run_GuidingCare()
+    # Future expansion point for other file types:
 if __name__ == "__main__":
-	main()
+    main()

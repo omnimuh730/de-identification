@@ -1,0 +1,512 @@
+[
+	{
+		"fileName": "GuidingCare_AG_Data_Activities",
+		"rules": [
+			{
+				"seq": 0,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Member_ID",
+				"action": "hash"
+			},
+			{
+				"seq": 1,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Complaint_ID",
+				"action": "none"
+			},
+			{
+				"seq": 2,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Auth_Activity_Type",
+				"action": "none"
+			},
+			{
+				"seq": 3,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Assign_To",
+				"action": "none"
+			},
+			{
+				"seq": 4,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Priority",
+				"action": "none"
+			},
+			{
+				"seq": 5,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Status",
+				"action": "none"
+			},
+			{
+				"seq": 6,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Due_Date",
+				"action": "none"
+			},
+			{
+				"seq": 7,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Follow_Up_Date",
+				"action": "none"
+			},
+			{
+				"seq": 8,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Completed_Date",
+				"action": "none"
+			},
+			{
+				"seq": 9,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Comments",
+				"action": "none"
+			},
+			{
+				"seq": 10,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Created_By",
+				"action": "none"
+			},
+			{
+				"seq": 11,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Department",
+				"action": "none"
+			}
+		],
+		"skiprules": [
+			{
+				"location": "start",
+				"pattern": "Member_ID"
+			}
+		]
+	},
+	{
+		"fileName": "GuidingCare_AG_Data",
+		"rules": [
+			{
+				"seq": 0,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Complaint_Id",
+				"action": "hash"
+			},
+			{
+				"seq": 1,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Member_ID",
+				"action": "none"
+			},
+			{
+				"seq": 2,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Eligibility_Hierarchy_Code1",
+				"action": "none"
+			},
+			{
+				"seq": 3,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Eligibility_Hierarchy_Value1",
+				"action": "none"
+			},
+			{
+				"seq": 4,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Eligibility_Hierarchy_Code2",
+				"action": "none"
+			},
+			{
+				"seq": 5,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Eligibility_Hierarchy_Value2",
+				"action": "none"
+			},
+			{
+				"seq": 6,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Eligibility_Hierarchy_Code3",
+				"action": "none"
+			},
+			{
+				"seq": 7,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Eligibility_Hierarchy_Value3",
+				"action": "none"
+			},
+			{
+				"seq": 8,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Eligibility_Hierarchy_Code4",
+				"action": "none"
+			},
+			{
+				"seq": 9,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Eligibility_Hierarchy_Value4",
+				"action": "none"
+			},
+			{
+				"seq": 10,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Complaint_Type",
+				"action": "none"
+			},
+			{
+				"seq": 11,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Complaint_Class",
+				"action": "none"
+			},
+			{
+				"seq": 12,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Complaint_Category",
+				"action": "none"
+			},
+			{
+				"seq": 13,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Status",
+				"action": "none"
+			},
+			{
+				"seq": 14,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Level",
+				"action": "none"
+			},
+			{
+				"seq": 15,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Notification_Date",
+				"action": "none"
+			},
+			{
+				"seq": 16,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Created_Date",
+				"action": "none"
+			},
+			{
+				"seq": 17,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Intake_Staff",
+				"action": "none"
+			},
+			{
+				"seq": 18,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Responsible_Staff",
+				"action": "none"
+			},
+			{
+				"seq": 19,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Analyst",
+				"action": "none"
+			},
+			{
+				"seq": 20,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Medical_Advisor",
+				"action": "none"
+			}
+		],
+		"skiprules": [
+			{
+				"location": "start",
+				"pattern": "Complaint_Id"
+			}
+		]
+	},
+	{
+		"fileName": "GuidingCare_Auth_Activities",
+		"rules": [
+			{
+				"seq": 0,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Member_ID",
+				"action": "hash"
+			},
+			{
+				"seq": 1,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Authorization_ID",
+				"action": "none"
+			},
+			{
+				"seq": 2,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Auth_Activity_Type",
+				"action": "none"
+			},
+			{
+				"seq": 3,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Assign_To",
+				"action": "none"
+			},
+			{
+				"seq": 4,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Priority",
+				"action": "none"
+			},
+			{
+				"seq": 5,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Status",
+				"action": "none"
+			},
+			{
+				"seq": 6,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Due_Date",
+				"action": "none"
+			},
+			{
+				"seq": 7,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Follow_Up_Date",
+				"action": "none"
+			},
+			{
+				"seq": 8,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Completed_Date",
+				"action": "none"
+			},
+			{
+				"seq": 9,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Comments",
+				"action": "none"
+			},
+			{
+				"seq": 10,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Created_By",
+				"action": "none"
+			},
+			{
+				"seq": 11,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Department",
+				"action": "none"
+			}
+		],
+		"skiprules": [
+			{
+				"location": "start",
+				"pattern": "Member_ID"
+			}
+		]
+	},
+	{
+		"fileName": "GuidingCare_Auth_Header",
+		"rules": [
+			{
+				"seq": 0,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Member_ID",
+				"action": "hash"
+			},
+			{
+				"seq": 1,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Authorization_ID",
+				"action": "none"
+			},
+			{
+				"seq": 2,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Eligibility_Level_Value_Code_1",
+				"action": "none"
+			},
+			{
+				"seq": 3,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Eligibility_Level_Level_Desc_1",
+				"action": "none"
+			},
+			{
+				"seq": 4,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Eligibility_Level_Value_Code_2",
+				"action": "none"
+			},
+			{
+				"seq": 5,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Eligibility_Level_Level_Desc_2",
+				"action": "none"
+			},
+			{
+				"seq": 6,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Eligibility_Level_Value_Code_3",
+				"action": "none"
+			},
+			{
+				"seq": 7,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Eligibility_Level_Level_Desc_3",
+				"action": "none"
+			},
+			{
+				"seq": 8,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Eligibility_Level_Value_Code_4",
+				"action": "none"
+			},
+			{
+				"seq": 9,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Eligibility_Level_Level_Desc_4",
+				"action": "none"
+			},
+			{
+				"seq": 10,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Authorization_Type",
+				"action": "none"
+			},
+			{
+				"seq": 11,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Authorization_Priority",
+				"action": "none"
+			},
+			{
+				"seq": 12,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Auth_Status",
+				"action": "none"
+			}
+		],
+		"skiprules": [
+			{
+				"location": "start",
+				"pattern": "Member_ID"
+			}
+		]
+	},
+	{
+		"fileName": "GuidingCare_Auth_Lines",
+		"rules": [
+			{
+				"seq": 0,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Member_ID",
+				"action": "hash"
+			},
+			{
+				"seq": 1,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Authorization_ID",
+				"action": "none"
+			},
+			{
+				"seq": 2,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Service_Code_Type",
+				"action": "none"
+			},
+			{
+				"seq": 3,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Service_Code",
+				"action": "none"
+			},
+			{
+				"seq": 4,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Effective_Date",
+				"action": "none"
+			},
+			{
+				"seq": 5,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Unit_Type",
+				"action": "none"
+			},
+			{
+				"seq": 6,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Requested_Units",
+				"action": "none"
+			},
+			{
+				"seq": 7,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Decision_Status",
+				"action": "none"
+			},
+			{
+				"seq": 8,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Decision_Reason_Code",
+				"action": "none"
+			}
+		],
+		"skiprules": [
+			{
+				"location": "start",
+				"pattern": "Member_ID"
+			}
+		]
+	},
+	{
+		"fileName": "GuidingCare_CM_Notes",
+		"rules": [
+			{
+				"seq": 0,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Member_ID",
+				"action": "hash"
+			},
+			{
+				"seq": 1,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Note_Type",
+				"action": "none"
+			},
+			{
+				"seq": 2,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Note_Text",
+				"action": "none"
+			},
+			{
+				"seq": 3,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Created_Date",
+				"action": "none"
+			},
+			{
+				"seq": 4,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Created_By",
+				"action": "none"
+			},
+			{
+				"seq": 5,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Is_Alert",
+				"action": "none"
+			},
+			{
+				"seq": 6,
+				"seg": "GuidingCare_AG_DATA_Activities",
+				"field_name": "Confidentiality_Type",
+				"action": "none"
+			}
+		],
+		"skiprules": [
+			{
+				"location": "start",
+				"pattern": "Member_ID"
+			}
+		]
+	}
+]
