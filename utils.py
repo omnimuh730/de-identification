@@ -9,6 +9,7 @@ import random
 import string
 import os
 import json
+from datetime import datetime, timedelta  # <-- Add this import
 
 def extract_numbers_and_hash(text, preserve_length=True):
 	"""Extract numbers from text, hash them, and replace while preserving format"""
@@ -154,26 +155,39 @@ def generate_fake_provider_name():
 	
 	return f"{last}, {first}"
 
+def deidentify_date(date_str):
+    """Given a date string 'YYYYMMDD', return the date 100 days ago in same format."""
+    try:
+        # Try parsing as YYYYMMDD
+        date_obj = datetime.strptime(date_str, "%Y%m%d")
+        new_date = date_obj - timedelta(days=100)
+        return new_date.strftime("%Y%m%d")
+    except Exception:
+        # If parsing fails, just return the original
+        return date_str
+
 def apply_deidentification_action(field_value, action):
-	"""Apply the specified de-identification action to a field value"""
-	if not field_value or action == 'none':
-		return field_value
-	
-	if action == 'hash':
-		return extract_numbers_and_hash(field_value)
-	elif action == 'mask':
-		return mask_data(field_value)
-	elif action == 'change':
-		return change_value(field_value)
-	elif action == 'pseudonymization':
-		# For provider names or general pseudonymization
-		if any(indicator in field_value.upper() for indicator in [',', 'DR', 'MD', 'DO']):
-			return generate_fake_provider_name()
-		else:
-			# This will be handled specifically for name and address fields in the main script
-			return field_value
-	
-	return field_value
+    """Apply the specified de-identification action to a field value"""
+    if not field_value or action == 'none':
+        return field_value
+    
+    if action == 'hash':
+        return extract_numbers_and_hash(field_value)
+    elif action == 'mask':
+        return mask_data(field_value)
+    elif action == 'change':
+        return change_value(field_value)
+    elif action == 'pseudonymization':
+        # For provider names or general pseudonymization
+        if any(indicator in field_value.upper() for indicator in [',', 'DR', 'MD', 'DO']):
+            return generate_fake_provider_name()
+        else:
+            # This will be handled specifically for name and address fields in the main script
+            return field_value
+    elif action == 'birthday':
+        return deidentify_date(field_value)
+    
+    return field_value
 
 def process_name_components(name_field, action):
 	"""Process name field with caret-delimited components"""
