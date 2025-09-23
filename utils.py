@@ -41,10 +41,20 @@ def extract_numbers_and_hash(text, preserve_length=True):
 	return result
 
 def mask_data(text):
-	"""Apply partial masking to data"""
+	"""Apply partial masking to data using shifting logic for numbers and letters."""
+	def shift_char(c):
+		if c.isdigit():
+			return str((int(c) + 3) % 10)
+		elif c.islower():
+			return chr((ord(c) - ord('a') + 20) % 26 + ord('a'))
+		elif c.isupper():
+			return chr((ord(c) - ord('A') + 20) % 26 + ord('A'))
+		else:
+			return c
+
 	if not text or len(text) <= 2:
 		return text
-	
+
 	# For email-like patterns
 	if '@' in text:
 		parts = text.split('@')
@@ -52,29 +62,42 @@ def mask_data(text):
 			local = parts[0]
 			domain = parts[1]
 			if len(local) > 2:
-				masked_local = local[0] + '*' * (len(local) - 2) + local[-1]
+				masked_local = (
+					local[0] +
+					''.join(shift_char(c) for c in local[1:-1]) +
+					local[-1]
+				)
 			else:
 				masked_local = local
 			return f"{masked_local}@{domain}"
-	
+
 	# For phone numbers with format (xxx)xxx-xxxx
 	if re.match(r'^\(\d{3}\)\d{3}-\d{4}', text):
-		return f"({text[1:4]}){text[5:8]}-****"
-	
+		# Only mask the last 4 digits
+		return f"({text[1:4]}){text[5:8]}-" + ''.join(shift_char(c) for c in text[9:13])
+
 	# For dates (YYYYMMDD or YYYY-MM-DD format)
 	if re.match(r'^\d{4}[-/]?\d{2}[-/]?\d{2}', text):
-		# Keep year, mask month and day
+		# Mask month and day
 		if '-' in text or '/' in text:
 			parts = re.split(r'[-/]', text)
-			return f"{parts[0]}-**-**"
+			masked = parts[0] + '-' + ''.join(shift_char(c) for c in parts[1]) + '-' + ''.join(shift_char(c) for c in parts[2])
+			return masked
 		else:
-			return text[:4] + "****"
-	
-	# For general text masking
+			return text[:4] + ''.join(shift_char(c) for c in text[4:])
+
+	# For general text masking (mask middle part)
 	if len(text) > 4:
-		return text[0] + '*' * (len(text) - 2) + text[-1]
+		return (
+			text[0] +
+			''.join(shift_char(c) for c in text[1:-1]) +
+			text[-1]
+		)
 	else:
-		return text[0] + '*' * (len(text) - 1)
+		return (
+			text[0] +
+			''.join(shift_char(c) for c in text[1:])
+		)
 
 def change_value(value):
 	"""Convert/change values for de-identification"""
@@ -156,38 +179,38 @@ def generate_fake_provider_name():
 	return f"{last}, {first}"
 
 def deidentify_date(date_str):
-    """Given a date string 'YYYYMMDD', return the date 100 days ago in same format."""
-    try:
-        # Try parsing as YYYYMMDD
-        date_obj = datetime.strptime(date_str, "%Y%m%d")
-        new_date = date_obj - timedelta(days=100)
-        return new_date.strftime("%Y%m%d")
-    except Exception:
-        # If parsing fails, just return the original
-        return date_str
+	"""Given a date string 'YYYYMMDD', return the date 100 days ago in same format."""
+	try:
+		# Try parsing as YYYYMMDD
+		date_obj = datetime.strptime(date_str, "%Y%m%d")
+		new_date = date_obj - timedelta(days=100)
+		return new_date.strftime("%Y%m%d")
+	except Exception:
+		# If parsing fails, just return the original
+		return date_str
 
 def apply_deidentification_action(field_value, action):
-    """Apply the specified de-identification action to a field value"""
-    if not field_value or action == 'none':
-        return field_value
-    
-    if action == 'hash':
-        return extract_numbers_and_hash(field_value)
-    elif action == 'mask':
-        return mask_data(field_value)
-    elif action == 'change':
-        return change_value(field_value)
-    elif action == 'pseudonymization':
-        # For provider names or general pseudonymization
-        if any(indicator in field_value.upper() for indicator in [',', 'DR', 'MD', 'DO']):
-            return generate_fake_provider_name()
-        else:
-            # This will be handled specifically for name and address fields in the main script
-            return field_value
-    elif action == 'birthday':
-        return deidentify_date(field_value)
-    
-    return field_value
+	"""Apply the specified de-identification action to a field value"""
+	if not field_value or action == 'none':
+		return field_value
+	
+	if action == 'hash':
+		return extract_numbers_and_hash(field_value)
+	elif action == 'mask':
+		return mask_data(field_value)
+	elif action == 'change':
+		return change_value(field_value)
+	elif action == 'pseudonymization':
+		# For provider names or general pseudonymization
+		if any(indicator in field_value.upper() for indicator in [',', 'DR', 'MD', 'DO']):
+			return generate_fake_provider_name()
+		else:
+			# This will be handled specifically for name and address fields in the main script
+			return field_value
+	elif action == 'birthday':
+		return deidentify_date(field_value)
+	
+	return field_value
 
 def process_name_components(name_field, action):
 	"""Process name field with caret-delimited components"""
