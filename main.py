@@ -100,10 +100,33 @@ def run_GuidingCare():
         print("\n✗ Guiding Care de-identification process failed!")
     return success
 
+def run_Provider():
+    """Main entry point for Provider CSV de-identification processes"""
+    print("=== De-identification Process (Provider CSV) ===\n")
+    print("Processing Provider CSV files...\n")
+
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    provider_dir = os.path.join(current_dir, "Data", "Provider")
+    provider_deid_dir = os.path.join(current_dir, "De-Identified", "Provider")
+
+    if not os.path.exists(provider_dir):
+        print(f"Provider directory does not exist: {provider_dir}")
+        return False
+    print("Processing Provider CSV files...")
+    success = run_hl7_deidentification(provider_dir, provider_deid_dir, "Provider")
+
+    if success:
+        print("\n" + "✓ Provider CSV de-identification completed successfully!")
+    else:
+        print("\n" + "✗ Provider CSV de-identification process failed!")
+    return success
+
 def main():
     run_Member()
     run_Claims()
     run_GuidingCare()
+    # Provider CSV de-identification (non-HL7)
+    run_Provider()
     # Future expansion point for other file types:
 if __name__ == "__main__":
     main()

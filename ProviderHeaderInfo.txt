@@ -1,0 +1,14 @@
+PS C:\Users\jj751487\Downloads\FS> python ReadProviderHeaders.py
+Listing first lines under: C:\Users\jj751487\Downloads\FS\Data\Provider
+1072025\TSA_Provider Addresses.csv: provider,npi,provid,fedid,status,Provider_lastupdate,fullname,provtype,Provider
+TypeDesc,provclass,specialtycode,SpecialtyCodeDesc,Address,entid,addr1,addr2,city,phyaddr1,phyaddr2,phycity,phyzip,affiliation,affiliationid,affiliateid,effdate,termdate,affiltype,Affiliation_lastupdate,Payto_Provider,Payto_provid,Group_Fullname,Group_Npi,entityid,fedid
+1072025\TSA_Provider Networks.csv: provider,npi,provid,fedid,status,Provider_lastupdate,fullname,provtype,ProviderT
+ypeDesc,provclass,specialtycode,SpecialtyCodeDesc,Network_affiliation,affiliationid,affiliateid,effdate,termdate,affiltype,Affiliation_lastupdate,Network,Network_provid,Network_Fullname
+1072025\TSA_Provider_Demgraphics.csv: provider,npi,provid,fedid,status,Provider_lastupdate,fullname,provtype,Provid
+erTypeDesc,provclass,specialtycode,SpecialtyCodeDesc,Address,entid,addr1,addr2,city,phyaddr1,phyaddr2,phycity,phyzip,Affiliation,affiliationid,affiliateid,effdate,termdate,affiltype,Affiliation_lastupdate,Plan_affiliation,(No column name),(No column name),Payto_Provider,Payto_provid,Group_Fullname,Group_Npi,entityid,fedid
+1072025\TSS_Provider Addresses.csv: provider,npi,provid,fedid,status,Provider_lastupdate,fullname,provtype,Provider
+TypeDesc,provclass,specialtycode,SpecialtyCodeDesc,Address,entid,addr1,addr2,city,phyaddr1,phyaddr2,phycity,phyzip,affiliation,affiliationid,affiliateid,effdate,termdate,affiltype,Affiliation_lastupdate,Payto_Provider,Payto_provid,Group_Fullname,Group_Npi,entityid,fedid
+1072025\TSS_Provider Networks.csv: provider,npi,provid,fedid,status,Provider_lastupdate,fullname,provtype,ProviderT
+ypeDesc,provclass,specialtycode,SpecialtyCodeDesc,Network_affiliation,affiliationid,affiliateid,effdate,termdate,affiltype,Affiliation_lastupdate,Network,Network_provid,Network_Fullname
+1072025\TSS_Provider_Demgraphics.csv: provider,npi,provid,fedid,status,Provider_lastupdate,fullname,provtype,Provid
+erTypeDesc,provclass,specialtycode,SpecialtyCodeDesc,Address,entid,addr1,addr2,city,phyaddr1,phyaddr2,phycity,phyzip,Affiliation,affiliationid,affiliateid,effdate,termdate,affiltype,Affiliation_lastupdate,Plan_affiliation,newassigns,pcp,Payto_Provider,Payto_provid,Group_Fullname,Group_Npi,entityid,fedid

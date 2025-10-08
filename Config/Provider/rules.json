@@ -1,0 +1,8 @@
+{
+  "applyTo": ["*.csv"],
+  "caseInsensitive": true,
+  "columns": [
+    { "name": "fedid", "action": "hash" },
+    { "match": { "mode": "regex", "value": "^(taxid|tax_id|tin|fein|federal\\s*tax\\s*id|federalid|fed[_ ]?id)$" }, "action": "hash" }
+  ]
+}
