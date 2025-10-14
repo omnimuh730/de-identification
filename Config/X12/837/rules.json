@@ -1,0 +1,18 @@
+{
+  "elementSeparator": "*",
+  "segmentTerminator": "~",
+  "nameSegments": [
+    { "segment": "NM1", "qualifierElement": 1, "qualifiers": ["IL", "QC"] }
+  ],
+  "addressSegments": [
+    { "segment": "N3" },
+    { "segment": "N4" }
+  ],
+  "demographicSegments": [
+    { "segment": "DMG" }
+  ],
+  "idSegments": [
+    { "segment": "REF", "qualifierElement": 1, "hashQualifiers": ["SY", "MI"] },
+    { "segment": "NM1", "hashWhen": { "qualifierElement": 1, "qualifiers": ["IL", "QC"], "idQualifierElement": 8, "idQualifier": "MI", "idElement": 9 } }
+  ]
+}

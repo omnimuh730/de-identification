@@ -1,0 +1,25 @@
+837 - Member/Subscriber Data Deidentified Fields												
+												
+Data Element	Loop	Segment	Qualifier	Element ID	Description	Data Type / Length	Mandatory / Optional	Qualifier Value Definition	Sample Data	Example EDI Segment	Notes / Logic to Pick Data	Data Category
+Member Last Name	2010BA	NM1	IL	NM103	Subscriber Last Name	AN/60	Mandatory	IL - Insured or Subscriber	SMITH	NM1*IL*1*SMITH*JOHN****MI*123456789~	From the line starting with NM1*IL, split by '*' and take the 4th value — this is Member Last Name.	Identification Info
+Member First Name	2010BA	NM1	IL	NM104	Subscriber First Name	AN/35	Mandatory	IL - Insured or Subscriber	JOHN	NM1*IL*1*SMITH*JOHN****MI*123456789~	From the line starting with NM1*IL, split by '*' and take the 5th value — this is Member First Name.	Identification Info
+												
+Member ID	2010BA	NM1	IL	NM109	Subscriber Identifier	AN/80	Mandatory	IL - Insured or Subscriber	123456789	NM1*IL*1*SMITH*JOHN****MI*123456789~	From the line starting with NM1*IL, split by '*' and take the 9th value — this is Member ID.	Identification Info
+												
+Member DOB	2010BA	DMG	-	DMG02	Subscriber Date of Birth	DT8	Mandatory		19800101	DMG*D8*19800101*M~	From the line starting with DMG*D8, split by '*' and take the 2nd value — this is DOB (YYYYMMDD).	Demographics
+												
+Member Gender	2010BA	DMG	-	DMG03	Subscriber Gender Code	ID1	Mandatory		M	DMG*D8*19800101*M~	From the same DMG line, split by '*' and take the 3rd value — this is Gender (M/F).	Demographics
+												
+Member Address Line 1	2010BA	N3	-	N301	Street Address	AN/55	Mandatory		123 MAIN ST	N3*123 MAIN ST~	From the line starting with N3*, split by '*' and take the 2nd value — this is Address Line 1.	Address Info
+Member Address Line 2	2010BA	N3	-	N302	Street Address Line 2	AN/55	Optional		APT 5	N3*123 MAIN ST*APT 5~	From the same N3 line, take the 3rd value if available — this is Address Line 2.	Address Info
+Member City	2010BA	N4	-	N401	City	AN/30	Mandatory		ATLANTA	N4*ATLANTA*GA*30301~	From the line starting with N4*, split by '*' and take the 2nd value — this is City.	Address Info
+Member State	2010BA	N4	-	N402	State	ID2	Mandatory		GA	N4*ATLANTA*GA*30301~	From the same N4 line, split by '*' and take the 3rd value — this is State.	Address Info
+Member ZIP	2010BA	N4	-	N403	ZIP Code	ID9	Mandatory		30301	N4*ATLANTA*GA*30301~	From the same N4 line, split by '*' and take the 4th value — this is ZIP Code.	Address Info
+												
+Patient Relationship	2000C	PAT	-	PAT01	Patient Relationship to Subscriber	ID2	Mandatory		18	PAT*18~	From the line starting with PAT*, split by '*' and take the 2nd value — this is Relationship Code.	Relationship Info
+												
+Patient Last Name	2010CA	NM1	QC	NM103	Patient Last Name	AN/60	Mandatory	QC - Patient	DOE	NM1*QC*1*DOE*JANE****MI*987654321~	From the line starting with NM1*QC, split by '*' and take the 4th value — this is Patient Last Name.	Identification Info
+Patient First Name	2010CA	NM1	QC	NM104	Patient First Name	AN/35	Mandatory	QC - Patient	JANE	NM1*QC*1*DOE*JANE****MI*987654321~	From the line starting with NM1*QC, split by '*' and take the 5th value — this is Patient First Name.	Identification Info
+												
+Patient DOB	2010CA	DMG	-	DMG02	Patient Date of Birth	DT8	Mandatory		19900505	DMG*D8*19900505*F~	From the line starting with DMG*D8, split by '*' and take the 2nd value — this is DOB (YYYYMMDD).	Demographics
+Patient Gender	2010CA	DMG	-	DMG03	Patient Gender Code	ID1	Mandatory		F	DMG*D8*19900505*F~	From the same DMG line, split by '*' and take the 3rd value — this is Gender (M/F).	Demographics

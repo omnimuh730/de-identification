@@ -1,0 +1,127 @@
+Requirement Document: Member Data Extraction and Mapping from 837 File 
+
+1. Purpose 
+
+The purpose of this document is to define the requirements for extracting member-specific data (Subscriber and Patient) from 837 EDI claim files. It serves as the governing document for the technical mapping specification found in 837_Member_Data_Mapping.xlsx. 
+
+This document and its associated spreadsheet will be used by the development team to implement a configurable data extraction process, ensuring that member PII (Personally Identifiable Information) is accurately isolated for use in downstream systems, such as a de-identification service or a Member Master data store. 
+
+2. Business Requirement / Ask 
+
+The team needs to: 
+- Identify all member (subscriber and patient) related information present in the 837 file. 
+
+- Provide a precise technical mapping for the corresponding Loop, Segment, and Element identifiers for each required member data field. 
+
+- Compile this data into a definitive Excel mapping sheet for the development team to reference during the implementation of the data extraction process. 
+
+3. Scope 
+
+In Scope: 
+
+Extraction of subscriber and patient demographic, address, and relationship details from the 837 file as specified in the 837_Member_Data_Mapping.xlsx technical mapping. 
+
+Documenting the relevant Loops, Segments, and specific element positions for each data point. 
+
+Developing a configurable parser where the extraction logic (e.g., segment identifiers, delimiters, and element positions) is defined in a configuration file rather than hard-coded into the application. 
+
+Out of Scope: 
+
+Data Validation and Error Handling: This initial implementation will not include advanced error handling. The process will assume that inbound 837 files are well-formed and that all mandatory data elements specified in the mapping are present and valid. Files with missing mandatory segments may be rejected or result in incomplete data. 
+
+De-identification Process: The de-identification or anonymization of the extracted data. This document only covers the extraction of the raw member PII. De-identification is a subsequent, separate process that will consume the output of this extraction. 
+
+Non-Member Data: Any claim-level, provider-level, or financial segments (e.g., CLM, SV1, REF segments not related to the member) are explicitly out of scope for extraction. 
+
+4. Approach / Solution Design 
+
+Step 1: Identify Member Data 
+
+Data Type 
+
+Loop 
+
+Segment 
+
+Description 
+
+Subscriber Information 
+
+2000B 
+
+SBR 
+
+Subscriber hierarchy 
+
+Subscriber Name 
+
+2010BA 
+
+NM1 
+
+Subscriber name and ID 
+
+Subscriber Demographics 
+
+2010BA 
+
+DMG 
+
+DOB and Gender 
+
+Subscriber Address 
+
+2010BA 
+
+N3, N4 
+
+Street, City, State, ZIP 
+
+Patient Information (if different from subscriber) 
+
+2000C, 2010CA 
+
+PAT, NM1, DMG 
+
+Patient demographics 
+
+ 
+Step 2: Design a Configurable Extraction Process (The "How") 
+
+The development team will implement a parser capable of reading an 837 file. The core extraction logic will be driven by an external configuration file (e.g., JSON, YAML, or properties file) to ensure the solution is maintainable and adaptable to future changes. 
+
+This configuration file will be populated directly from the logic defined in 837_Member_Data_Mapping.xlsx. 
+
+Example: The logic in 837_Member_Data_Mapping.xlsx for Subscriber First Name is: "From the line starting with NM1*IL, split by '*' and take the 5th value." 
+
+Configuration Entry: This will translate into a configuration rule for the SubscriberFirstName field, specifying the segment identifier (NM1*IL), the delimiter (*), and the element index (5). 
+
+Step 3: Implementation and Output 
+
+Developers will use the configuration file to drive the parser's logic. The parser will iterate through the 837 file, identify the target segments based on the rules, and extract the specified data elements. 
+
+The final output of this process will be a structured data object or record (e.g., a JSON object or a Java POJO) containing the raw, identified member data. This output is then ready for consumption by downstream processes. 
+
+5. Expected Outcome 
+
+A validated technical mapping specification (837_Member_Data_Mapping.xlsx) that precisely defines the location of every required member data element. 
+
+A clear set of requirements for developers to build a flexible, configuration-driven parser for 837 files. 
+
+The successful extraction of raw member PII into a structured format, prepared for subsequent de-identification or other data handling processes. 
+
+6. Deliverables 
+
+Deliverable 
+
+Description 
+
+837_Member_Data_Mapping.xlsx 
+
+The Technical Mapping Specification contains the complete, element-level mapping logic that will be used to create the parser's configuration file 
+
+Requirement Document 
+
+This document outlines the business drivers, scope, and solution design for the extraction process. 
+
+ 
