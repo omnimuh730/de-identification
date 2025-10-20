@@ -1,0 +1,9 @@
+{
+  "caseInsensitive": true,
+  "columns": [
+    { "name": "NPI", "action": "hash" },
+    { "name": "RoutingNumber", "action": "hash" },
+    { "name": "AccountNumber", "action": "hash" }
+  ]
+}
+

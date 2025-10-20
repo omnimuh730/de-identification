@@ -1,0 +1,7 @@
+{
+  "caseInsensitive": true,
+  "columns": [
+    { "name": "Routing Number", "action": "hash" }
+  ]
+}
+

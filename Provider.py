@@ -175,8 +175,35 @@ def process_provider_csv_file(input_file_path, output_file_path, rules_obj):
         return False
 
 
+def _find_override_rules(script_dir, rel_path):
+    """Return a per-file rules.json path if present.
+
+    Looks for Config/Provider/<rel_dir>/<base>.json next to the file's
+    relative directory under Data/Provider.
+    """
+    rel_dir = os.path.dirname(rel_path)
+    base = os.path.splitext(os.path.basename(rel_path))[0]
+    # File-specific rules named after the CSV (case-insensitive on Windows)
+    candidate = os.path.join(
+        script_dir, "Config", "Provider", rel_dir, f"{base}.json"
+    )
+    if os.path.exists(candidate):
+        return candidate
+    # Also allow lower-cased filename for portability
+    candidate_lower = os.path.join(
+        script_dir, "Config", "Provider", rel_dir, f"{base.lower()}.json"
+    )
+    if os.path.exists(candidate_lower):
+        return candidate_lower
+    return None
+
+
 def run(input_dir, output_dir):
-    """Main function to run Provider CSV de-identification recursively under input_dir."""
+    """Main function to run Provider CSV de-identification recursively under input_dir.
+
+    Supports global rules in Config/Provider/rules.json and optional per-file
+    overrides co-located under Config/Provider/<subdir>/<filename>.json.
+    """
     print("Starting Provider CSV de-identification process...")
     print(f"Input directory: {input_dir}")
     print(f"Output directory: {output_dir}")
@@ -226,7 +253,18 @@ def run(input_dir, output_dir):
         rel = os.path.relpath(in_path, input_dir)
         out_path = os.path.join(output_dir, rel)
         os.makedirs(os.path.dirname(out_path), exist_ok=True)
-        if process_provider_csv_file(in_path, out_path, rules_obj):
+
+        # Choose effective rules: per-file override if present, else global
+        effective_rules = rules_obj
+        try:
+            override_path = _find_override_rules(script_dir, rel)
+            if override_path:
+                effective_rules = load_deid_rules(override_path)
+                print(f"Using override rules: {os.path.relpath(override_path, script_dir)}")
+        except Exception as ex:
+            print(f"Warning: failed to load override rules for {rel}: {ex}")
+
+        if process_provider_csv_file(in_path, out_path, effective_rules):
             success_count += 1
         else:
             print(f"Failed to process: {rel}")
