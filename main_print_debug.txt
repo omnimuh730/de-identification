@@ -40,9 +40,9 @@ def run_Member():
     print("Processing Member files...")
     success = run_hl7_deidentification(member_dir, member_deid_dir, "Member")
     if success:
-        print("\n- De-identification completed successfully!")
+        print("\n✓ De-identification completed successfully!")
     else:
-        print("\n- De-identification process failed!")
+        print("\n✗ De-identification process failed!")
     return success
 
 
@@ -58,9 +58,9 @@ def run_Claims():
     print("Processing Claims files...")
     success = run_hl7_deidentification(claims_dir, claims_deid_dir, "Claims")
     if success:
-        print("\n- Claims de-identification completed successfully!")
+        print("\n✓ Claims de-identification completed successfully!")
     else:
-        print("\n- Claims de-identification process failed!")
+        print("\n✗ Claims de-identification process failed!")
     return success
 
 
@@ -77,9 +77,9 @@ def run_GuidingCare():
     from GuidingCare import run as run_guidingcare
     success = run_guidingcare(gc_dir, gc_deid_dir)
     if success:
-        print("\n- Guiding Care de-identification completed successfully!")
+        print("\n✓ Guiding Care de-identification completed successfully!")
     else:
-        print("\n- Guiding Care de-identification process failed!")
+        print("\n✗ Guiding Care de-identification process failed!")
     return success
 
 
@@ -95,9 +95,9 @@ def run_Provider():
     print("Processing Provider CSV files...")
     success = run_hl7_deidentification(provider_dir, provider_deid_dir, "Provider")
     if success:
-        print("\n- Provider CSV de-identification completed successfully!")
+        print("\n✓ Provider CSV de-identification completed successfully!")
     else:
-        print("\n- Provider CSV de-identification process failed!")
+        print("\n✗ Provider CSV de-identification process failed!")
     return success
 
 
@@ -114,9 +114,9 @@ def run_X12_837():
     from X12_837 import run as run_x12
     success = run_x12(x12_dir, x12_deid_dir)
     if success:
-        print("\n- X12 837 de-identification completed successfully!")
+        print("\n✓ X12 837 de-identification completed successfully!")
     else:
-        print("\n- X12 837 de-identification process failed!")
+        print("\n✗ X12 837 de-identification process failed!")
     return success
 
 
@@ -130,4 +130,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 

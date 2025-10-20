@@ -200,6 +200,16 @@ def process_file(content: str, rules: dict) -> str:
                 if len(parts) > dmg_gender_idx and parts[dmg_gender_idx]:
                     parts[dmg_gender_idx] = apply_deidentification_action(parts[dmg_gender_idx], dmg_gender_action)
 
+        elif seg_id == 'PAT':
+            # Relationship segment; not PII, default action none; configurable
+            if (
+                isinstance(pat_rel_idx, int)
+                and pat_rel_action != 'none'
+                and len(parts) > pat_rel_idx
+                and parts[pat_rel_idx]
+            ):
+                parts[pat_rel_idx] = apply_deidentification_action(parts[pat_rel_idx], pat_rel_action)
+
         elif seg_id == 'REF':
             # Hash REF value when qualifier matches and in IL/QC context
             q_idx, quals = ref_hash_quals
@@ -295,7 +305,3 @@ if __name__ == "__main__":
     in_dir = os.path.join(script_dir, "Data", "X12", "837")
     out_dir = os.path.join(script_dir, "De-Identified", "X12", "837")
     run(in_dir, out_dir)
-        elif seg_id == 'PAT':
-            # Relationship segment; not PII, default action none; configurable
-            if isinstance(pat_rel_idx, int) and pat_rel_action != 'none' and len(parts) > pat_rel_idx and parts[pat_rel_idx]:
-                parts[pat_rel_idx] = apply_deidentification_action(parts[pat_rel_idx], pat_rel_action)
