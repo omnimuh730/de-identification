@@ -1,127 +1,113 @@
-# Healthcare Data De-Identification – Overview and Usage
+# 837 X12 De-identification Playbook
 
-This project de-identifies healthcare datasets using rule-driven, field-level transformations. It supports multiple feeds (Member, Claims, Guiding Care) and now adds Provider CSV de-identification without changing prior HL7/text logic.
+This guide explains how member and patient PHI is de-identified in ANSI X12 837 professional dental (`837D`) claim files. It is written so validators can reproduce the run, understand every transformation, and confirm that outputs remain structurally valid for downstream systems.
 
-## What’s Included
-- Orchestration: `main.py` dynamically loads each feed module and runs it with matching input/output folders.
-- Modules:
-  - `Member.py` – pipe-delimited/HL7-like text data
-  - `Claims.py` – pipe-delimited text data
-  - `GuidingCare.py` – multiple files via config with skip rules
-  - `Provider.py` – NEW: CSV data de-identification (first line header)
-- Utilities: `utils.py` – hashing, masking, value changes, pseudonymization, date shifting.
-- Configs:
-  - `Config/Member/rules.json`
-  - `Config/Claims/rules.json`
-  - `Config/Guiding Care/rules.json`
-  - `Config/Provider/rules.json` – NEW: maps `fedid` to `hash` for all CSVs
+## Scope and Objectives
+- **Inputs**: Raw 837 files placed under `Data/X12/837`. The sample file in this repository (`Data/X12/837/TSA_0709/837D_TSA_2025070901_660707485_905775641_20250710005041.x12`) uses the standard element separator `*` and segment terminator `~`.
+- **Outputs**: De-identified copies written to `De-Identified/X12/837`, preserving the relative folder structure of the inputs.
+- **Targets**: Subscriber (loop 2000B/2010BA) and patient (loop 2000C/2010CA) names, identifiers, addresses, dates of birth, genders, and reference IDs. Claim-level financial data remains untouched.
 
-## Goals and Guarantees
-- Existing HL7/text pipelines and results are unchanged.
-- New Provider CSV flow recognizes `.csv`, reads header, applies configured actions, and writes CSV outputs.
-- Core de-identification behavior is reused from `utils.py` to ensure consistency.
+Other feeds (Member, Claims, Guiding Care, Provider CSV) exist in the repo but fall outside this document.
 
-## Directory Layout (Data In/Out)
-- Input
-  - `Data/Member`, `Data/Claims`, `Data/Guiding Care`
-  - `Data/Provider` (e.g., `Data/Provider/1072025/*.csv`)
-- Output (mirrors input structure)
-  - `De-Identified/Member`, `De-Identified/Claims`, `De-Identified/Guiding Care`
-  - `De-Identified/Provider` (e.g., `De-Identified/Provider/1072025/*.csv`)
+## Files to Know
+- `X12_837.py` – processing script; can run standalone or via `main.py`.
+- `Config/X12/837/rules.json` – rule configuration that controls which segments/elements are modified and which action to apply.
+- `Config/X12/837/837_Layout.txt` – mapping reference showing loop/segment/element positions for member and patient data.
+- `Config/X12/837/837_doc.txt` – business requirements that motivated the extraction and de-identification scope.
+- `utils.py` – shared library containing the hash, mask, pseudonymization, and date-shift helpers.
 
-## Running
-- Run all feeds (Member, Claims, Guiding Care, Provider CSV):
-  - `python main.py`
-  - You should see a banner for each feed, including “De-identification Process (Provider CSV)” once Provider runs.
-- Run only Provider CSV:
-  - `python Provider.py`
+Keep these files in sync when promoting updates. Validators should review `rules.json` and this playbook together.
 
-## What Changed in This Update
-- Added Provider CSV support (no changes to HL7/text de-identification):
-  - New config: `Config/Provider/rules.json` (case-insensitive column matching; applies to `*.csv`).
-  - New module: `Provider.py` (CSV reader/writer, header-driven field mapping, progress printing, recursive discovery under `Data/Provider`).
-  - Updated: `main.py` now calls `run_Provider()` after existing feeds.
+## Running the Processor
+1. Open a terminal at the repository root (`c:\Users\jj751487\Downloads\FS`).
+2. Execute:
+   ```
+   python X12_837.py
+   ```
+   The script will:
+   - Load `Config/X12/837/rules.json`.
+   - Discover all files with extensions `.x12`, `.edi`, `.txt`, or `.837` under `Data/X12/837`.
+   - Write their de-identified counterparts into `De-Identified/X12/837`.
+3. Watch the console output. For each file you should see `De-identification of <file> started` and `De-identified X12 837 saved to: ...` followed by a progress banner (`=== 60.0% ===`).
+4. When the run completes, verify that the success summary shows every file processed (e.g., `Successfully processed: 1/1 files`).
 
-## Which Data Changes and How (By Feed)
+> Validation tip: remove or archive prior contents of `De-Identified/X12/837` before each run so you only review fresh outputs.
 
-### Provider (CSV) – NEW
-- Column(s): `fedid` (any column with header name `fedid`, case-insensitive; files show multiple `fedid` columns in some layouts and each is processed)
-- Action: `hash` (via `utils.extract_numbers_and_hash`) – replaces each numeric chunk with deterministic digits derived from SHA-256 of the original chunk; preserves digits count and leaves punctuation intact.
-  - Example shape: `12-3456789` → `75-3815618` (illustrative only; deterministic per input).
+## What the Rules Do
+The rule file contains these key sections (element indexes are zero-based inside the script, one-based in X12 documentation):
 
-## Provider CSV Details
-- File discovery: Recursively scans `Data/Provider` for `*.csv` and mirrors the relative paths to `De-Identified/Provider`.
-- Header-driven mapping: Reads the first row as the header and builds a column→action map from `Config/Provider/rules.json`.
-- Matching modes supported in rules:
-  - `name`: exact column name match (case-insensitive by default)
-  - `match.mode: exact|icontains|regex` to flexibly match variants
-- Current Provider rules highlight Tax ID fields:
-  - `Config/Provider/rules.json` targets `fedid` by name and also matches common aliases via regex: `taxid`, `tax_id`, `tin`, `fein`, `federal tax id`, `federalid`, `fed id`.
-  - All matched columns use the `hash` action so numeric digits change deterministically while formatting remains stable.
+| Rule Group | Applicable Segment(s) | Context | Elements affected | Action | Result |
+|------------|-----------------------|---------|-------------------|--------|--------|
+| `nameSegments` | `NM1` | When `NM102` equals `IL` (subscriber) or `QC` (patient) | `NM103` (last), `NM104` (first), `NM105` (middle) | `pseudonymization` via `generate_fake_name()` | Replaces with uppercase synthetic names. |
+| `addressSegments` | `N3`, `N4` | Follows a qualifying `NM1` | `N301` (street), `N302` (optional line 2), `N401-403` (city/state/ZIP) | `pseudonymization` + `mask` + `hash` | Provides a synthetic street, random city/state, and hashes ZIP digits while keeping format. |
+| `demographicSegments` | `DMG` | Same subscriber/patient context | `DMG02` (DOB) and `DMG03` (gender) | `birthday`, `change` | DOB shifted back 100 days; gender flipped (`M↔F`) with casing preserved. |
+| `idSegments` | `REF`, `NM1` | `REF` with qualifiers `SY` or `MI`; `NM1` when `NM108`=`MI` | Value component or `NM109` | `hash` | Digit sequences replaced with deterministic hashed digits; punctuation retained. |
+| `pat.actions` | `PAT` | Patient loop | `PAT01` | `none` (configurable) | Relationship codes are left untouched in this release. |
 
-### Why `fedid` equals Tax ID (EIN)
-- In the Provider CSV headers you shared, `fedid` appears alongside provider identifiers and organizational attributes, and is commonly used to denote the federal tax identifier (EIN).
-- To be robust, the config also includes synonyms (TIN/FEIN/etc.) so any dataset using alternate labels is still de-identified correctly.
-- Outcome: Any column representing a business Tax ID will be de-identified using the same policy as Tax ID, ensuring compliance without breaking downstream consumers.
+Actions are implemented in `utils.py`. Notable behaviors:
+- `hash` (`extract_numbers_and_hash`) only changes numeric sequences and keeps length/format, so `123-45-6789` could become `742-93-1056`.
+- `birthday` subtracts 100 days from valid `YYYYMMDD` dates.
+- `pseudonymization` for names/addresses uses random selections; outputs are not deterministic run-to-run.
 
-### Transformation rationale for Provider
-- `hash` for Tax ID fields preserves length and punctuation (e.g., `##-#######`) enabling joins or validations that depend on shape, while preventing recovery of the original values.
-- Deterministic hashing means the same source Tax ID always maps to the same de-identified value across files, aiding cross-file linkage where needed.
+## Processing Flow Overview
+1. **Delimiter detection** – the script reads the `ISA` segment and auto-detects the element separator and segment terminator. If the rules file specifies explicit separators they override auto-detection.
+2. **Segment iteration** – each segment is split; when an `NM1` segment matches the configured qualifiers the script records the context (`IL` or `QC`).
+3. **Name replacement** – qualifying `NM1` segments receive new synthetic last/first/middle names.
+4. **Address rewrite** – the following `N3` segment gets a generated street; `N4` reuses the same fake city/state and hashes the ZIP digits.
+5. **Demographics** – in the same context, `DMG02` is shifted back 100 days and `DMG03` is flipped. `DMG01` (format indicator) is left unchanged.
+6. **Identifiers** – `REF` segments with qualifiers in the hash list and `NM109` (when the ID qualifier is `MI`) are hashed. This produces consistent pseudo-identifiers across files.
+7. **Output assembly** – segments are rejoined using the detected separators, and the original terminator is appended after every segment to preserve EDI compliance.
 
-### Verifying Provider results
-- Compare a sample row before/after for a Tax ID field:
-  - Open `Data/Provider/.../*.csv` and the corresponding `De-Identified/Provider/.../*.csv`.
-  - Look at `fedid` (or a matched alias). The digits should differ while separators and overall length remain the same.
-- If a value appears unchanged, check whether the field is empty or non-numeric; only digit sequences are transformed.
+## Validator Checklist
+Use this list before, during, and after execution.
 
-### Member (text/HL7)
-- Examples from `Config/Member/rules.json`:
-  - `ID`, `MemberID` → `hash`
-  - `LastName`, `FirstName`, `MiddleName`, `Suffix` → `pseudonymization` (random but plausible names)
-  - `Email`, `HomePhone`, `CellPhone` → `mask`
-  - `Gender` → `change` (M↔F, case-aware)
-  - `DateOfBirth` → `birthday` (shift 100 days back)
-  - Addresses (`ResidentialAddress`, `MailingAddress`) → `pseudonymization` (generate synthetic address)
-  - Enrollment and other IDs in named segments → `hash` per sequence in rules
+- **Pre-run checks**
+  - Confirm the correct configuration is in place: compare the checksum or timestamp of `Config/X12/837/rules.json` against the approved version.
+  - Verify input files begin with an `ISA` segment. Reject malformed files prior to processing.
+  - Clear or archive prior outputs from `De-Identified/X12/837`.
+- **During execution**
+  - Monitor standard output for runtime errors. The script prints stack traces if a file fails.
+  - Ensure the progress indicator advances through all files discovered.
+- **Post-run verification**
+  - The count of files in `De-Identified/X12/837` should equal the count in `Data/X12/837` (sub-folders included). If not, review the log for failures.
+  - Open a sample output file and confirm segment terminators (`~`) and element separators (`*`) match the source.
+  - Confirm there are no extra or missing `CLM` segments by performing a simple `CLM` count comparison between input and output.
 
-### Claims (text)
-- From `Config/Claims/rules.json`:
-  - `CLAIM_ID`, `MEM_NBR`, `MEM_ZIP` → `hash`
-  - `SVC_PROV_NAME` → `pseudonymization` (synthetic provider name)
-  - `MEM_DOB` → `birthday` (shift 100 days back)
-  - `MEM_GENDER`, `MEM_STATE`, `MEM_MARKET` → `change` (mapped values)
+## Field-Level Validation Steps
+Reference `Config/X12/837/837_Layout.txt` for loop/segment/element positions.
 
-### Guiding Care (text)
-- From `Config/Guiding Care/rules.json` (file-by-file):
-  - Most fields `action: none`.
-  - Commonly `Member_ID` → `hash`.
-  - Header lines skipped where configured (`skiprules`).
+### Subscriber loop 2000B / 2010BA
+- **Names** (`NM1*IL`):
+  - `NM103`–`NM105` must contain uppercase synthetic values unrelated to the original names.
+  - `NM109` (member identifier) should change while preserving separators and length.
+- **Address** (`N3` & `N4`):
+  - `N301` should show a synthetic street (number + street name). Optional `N302` is masked if present.
+  - `N401`/`N402` should reflect new city/state values; `N403` must show different digits but keep ZIP-length.
+- **Demographics** (`DMG*D8`):
+  - `DMG02` equals original DOB minus 100 days.
+  - `DMG03` flips gender (`M` to `F`, `F` to `M`).
 
-## Why You Might “See No Difference” in Output
-- Provider flow not executed: Ensure `python main.py` shows “Provider CSV” section, or run `python Provider.py` directly.
-- Output location: Check `De-Identified/Provider/...` (same relative paths as input under `Data/Provider`).
-- Empty or non-numeric `fedid`: The hasher only replaces numeric substrings; blanks or non-digit-only fields may appear unchanged aside from preserved punctuation.
-- Visual similarity: Hashing preserves digit counts and punctuation; values will look similar in shape but digits should differ from the original.
+### Patient loop 2000C / 2010CA
+- Apply the same checks for `NM1*QC`, `DMG`, `N3`, and `N4`. Note that this loop is optional; if absent the subscriber loop represents both member and patient.
 
-## Extending Provider Rules
-- Add more columns to `Config/Provider/rules.json` under `columns` (case-insensitive):
-  ```json
-  {
-    "applyTo": ["*.csv"],
-    "caseInsensitive": true,
-    "columns": [
-      { "name": "fedid", "action": "hash" },
-      { "name": "tin",   "action": "hash" },
-      { "name": "taxid", "action": "hash" }
-    ]
-  }
-  ```
-- Actions available: `hash`, `mask`, `change`, `pseudonymization`, `birthday`, or `none` (see `utils.py`).
+### Reference identifiers (`REF`)
+- For `REF*SY` and `REF*MI` segments within subscriber or patient contexts, confirm the qualifier stays the same and the value element is hashed (digits differ, punctuation intact).
+- Non-numeric values may remain unchanged because the hash routine only replaces digits; document any such cases for sign-off.
 
-## Determinism and Auditability
-- `hash` and `birthday` are deterministic given the same input.
-- `pseudonymization` (names/addresses) uses randomness and is not deterministic unless you add a random seed.
+### Segments intentionally untouched
+- `PAT*` relationship codes (e.g., `PAT*18~`) currently remain unchanged per business guidance.
+- Claim lines, provider data, financial amounts, and trailer segments are left exactly as received. If diffs are observed here, treat them as red flags.
 
-## Notes
-- We intentionally did not modify existing HL7/text code paths to protect previous results.
-- Progress indicators print percentages for lengthy files in all modules.
+## Troubleshooting
+- **No files processed** – confirm input extensions are supported (`.x12`, `.edi`, `.txt`, `.837`) and that they reside under `Data/X12/837`.
+- **Delimiters change unexpectedly** – inspect the source `ISA` segment. Custom terminators must appear in the positions the script reads; otherwise the fallback (`*`, `~`) is used.
+- **Name or address unchanged** – ensure the preceding `NM1` qualifier is `IL` or `QC`. If additional qualifiers need coverage, add them to `addressContextQualifiers` in `rules.json`.
+- **DOB unchanged** – verify the original format is `YYYYMMDD`. The date shift only runs on valid 8-digit strings.
+- **Hashed ID looks identical** – if the value contained no digits, hashing has no effect. Document and confirm with stakeholders whether alpha-only IDs need masking.
+
+## Extending the Rules
+- Modify `Config/X12/837/rules.json` to add new qualifiers, segments, or actions. Example: to mask `PAT01`, set `"relationshipAction": "mask"`.
+- When new actions are introduced, update `utils.py` if needed and provide validators with revised instructions.
+- Always rerun your validation suite (file counts, field spot checks, DOB offsets) after any configuration change.
+
+Following this playbook ensures each validator can reproduce the run, trace every transformation back to `rules.json`, and confirm that subscriber and patient PHI is fully de-identified while the EDI structure stays intact.

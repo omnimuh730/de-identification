@@ -64,6 +64,19 @@ def process_file(content: str, rules: dict) -> str:
     addr_rules = rules.get('addressSegments', [])
     demo_rules = rules.get('demographicSegments', [])
     id_rules = rules.get('idSegments', [])
+    address_context = set(rules.get('addressContextQualifiers', ['IL', 'QC']))
+
+    dmg_cfg = (rules.get('dmg') or {}).get('actions', {})
+    dmg_format_idx = int(dmg_cfg.get('formatIndex', 1)) if str(dmg_cfg.get('formatIndex', '')).isdigit() else 1
+    dmg_dob_idx = int(dmg_cfg.get('dobIndex', 2)) if str(dmg_cfg.get('dobIndex', '')).isdigit() else 2
+    dmg_gender_idx = int(dmg_cfg.get('genderIndex', 3)) if str(dmg_cfg.get('genderIndex', '')).isdigit() else 3
+    dmg_format_action = dmg_cfg.get('formatAction', 'none')
+    dmg_dob_action = dmg_cfg.get('dobAction', 'birthday')
+    dmg_gender_action = dmg_cfg.get('genderAction', 'change')
+
+    pat_cfg = (rules.get('pat') or {}).get('actions', {})
+    pat_rel_idx = int(pat_cfg.get('relationshipIndex', 1)) if str(pat_cfg.get('relationshipIndex', '')).isdigit() else 1
+    pat_rel_action = pat_cfg.get('relationshipAction', 'none')
 
     name_targets = {
         r.get('segment'): (r.get('qualifierElement'), set(r.get('qualifiers', [])))
@@ -142,7 +155,7 @@ def process_file(content: str, rules: dict) -> str:
 
         elif seg_id in addr_targets:
             # Apply address only for member/patient contexts
-            if current_entity in {'IL', 'QC'}:
+            if current_entity in address_context:
                 if seg_id == 'N3':
                     # Generate new fake address for this entity context
                     fake_addr = generate_fake_address()
@@ -178,15 +191,14 @@ def process_file(content: str, rules: dict) -> str:
 
         elif seg_id in demo_targets:
             # DMG for DOB/Gender, only IL/QC contexts
-            if current_entity in {'IL', 'QC'}:
-                # DMG01 (format) remains; DMG02=dob; DMG03=gender
-                if len(parts) > 1 and parts[1]:
-                    # keep date format (e.g., D8)
-                    pass
-                if len(parts) > 2 and parts[2]:
-                    parts[2] = apply_deidentification_action(parts[2], 'birthday')
-                if len(parts) > 3 and parts[3]:
-                    parts[3] = apply_deidentification_action(parts[3], 'change')
+            if current_entity in address_context:
+                # DMG01 format, DMG02 DOB, DMG03 Gender per config
+                if len(parts) > dmg_format_idx and parts[dmg_format_idx]:
+                    parts[dmg_format_idx] = apply_deidentification_action(parts[dmg_format_idx], dmg_format_action)
+                if len(parts) > dmg_dob_idx and parts[dmg_dob_idx]:
+                    parts[dmg_dob_idx] = apply_deidentification_action(parts[dmg_dob_idx], dmg_dob_action)
+                if len(parts) > dmg_gender_idx and parts[dmg_gender_idx]:
+                    parts[dmg_gender_idx] = apply_deidentification_action(parts[dmg_gender_idx], dmg_gender_action)
 
         elif seg_id == 'REF':
             # Hash REF value when qualifier matches and in IL/QC context
@@ -283,3 +295,7 @@ if __name__ == "__main__":
     in_dir = os.path.join(script_dir, "Data", "X12", "837")
     out_dir = os.path.join(script_dir, "De-Identified", "X12", "837")
     run(in_dir, out_dir)
+        elif seg_id == 'PAT':
+            # Relationship segment; not PII, default action none; configurable
+            if isinstance(pat_rel_idx, int) and pat_rel_action != 'none' and len(parts) > pat_rel_idx and parts[pat_rel_idx]:
+                parts[pat_rel_idx] = apply_deidentification_action(parts[pat_rel_idx], pat_rel_action)

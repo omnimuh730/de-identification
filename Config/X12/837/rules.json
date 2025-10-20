@@ -1,6 +1,7 @@
 {
   "elementSeparator": "*",
   "segmentTerminator": "~",
+  "addressContextQualifiers": ["IL", "QC"],
   "nameSegments": [
     { "segment": "NM1", "qualifierElement": 1, "qualifiers": ["IL", "QC"] }
   ],
@@ -11,6 +12,22 @@
   "demographicSegments": [
     { "segment": "DMG" }
   ],
+  "dmg": {
+    "actions": {
+      "formatIndex": 1,
+      "dobIndex": 2,
+      "genderIndex": 3,
+      "formatAction": "none",
+      "dobAction": "birthday",
+      "genderAction": "change"
+    }
+  },
+  "pat": {
+    "actions": {
+      "relationshipIndex": 1,
+      "relationshipAction": "none"
+    }
+  },
   "idSegments": [
     { "segment": "REF", "qualifierElement": 1, "hashQualifiers": ["SY", "MI"] },
     { "segment": "NM1", "hashWhen": { "qualifierElement": 1, "qualifiers": ["IL", "QC"], "idQualifierElement": 8, "idQualifier": "MI", "idElement": 9 } }
